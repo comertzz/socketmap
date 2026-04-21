@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:latlong2/latlong.dart';
-import '../providers/tracking_providers.dart';
+import 'package:socket_map/core/flavor/flavor_config.dart';
+import 'package:socket_map/features/vehicle_tracking/presentation/providers/tracking_providers.dart';
 
 class TrackingDetailScreen extends ConsumerStatefulWidget {
-  final String vehicleName;
   const TrackingDetailScreen({super.key, required this.vehicleName});
+
+  final String vehicleName;
 
   @override
   ConsumerState<TrackingDetailScreen> createState() =>
@@ -20,14 +22,18 @@ class _TrackingDetailScreenState extends ConsumerState<TrackingDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final fleetAsync = ref.watch(vehicleTrackingViewModelProvider);
+    final flavor = FlavorConfig.current;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: Text("${widget.vehicleName} Detayı")),
+      appBar: AppBar(
+        title: Text('${flavor.appTitle} | ${widget.vehicleName} Detayi'),
+      ),
       body: fleetAsync.when(
         data: (fleet) {
           final vehicle = fleet.firstWhere(
             (v) => v.name == widget.vehicleName,
-            orElse: () => throw Exception("Araç bulunamadı"),
+            orElse: () => throw Exception('Arac bulunamadi'),
           );
 
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -70,8 +76,8 @@ class _TrackingDetailScreenState extends ConsumerState<TrackingDetailScreen> {
                               width: 30,
                               height: 38.77,
                               child: SvgPicture.asset(
-                                clipBehavior: Clip.antiAlias,
                                 'assets/svg/moving_state.svg',
+                                clipBehavior: Clip.antiAlias,
                               ),
                             ),
                           ),
@@ -81,28 +87,27 @@ class _TrackingDetailScreenState extends ConsumerState<TrackingDetailScreen> {
                   ),
                 ),
               ),
-
               Expanded(
                 flex: 1,
                 child: Padding(
-                  padding: const EdgeInsets.all(20.0),
+                  padding: const EdgeInsets.all(20),
                   child: Card(
                     child: Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.all(16),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.speed,
                                 size: 30,
-                                color: Colors.orange,
+                                color: colorScheme.primary,
                               ),
                               const SizedBox(width: 10),
                               Text(
-                                "${vehicle.speed.toInt()} km/h",
+                                '${vehicle.speed} km/h',
                                 style: Theme.of(
                                   context,
                                 ).textTheme.headlineMedium,
@@ -111,19 +116,21 @@ class _TrackingDetailScreenState extends ConsumerState<TrackingDetailScreen> {
                           ),
                           const Divider(),
                           _buildDetailRow(
+                            context,
                             Icons.pin_drop,
-                            "Konum",
-                            "${vehicle.latitude.toStringAsFixed(4)}, ${vehicle.longitude.toStringAsFixed(4)}",
+                            'Konum',
+                            '${vehicle.latitude.toStringAsFixed(4)}, ${vehicle.longitude.toStringAsFixed(4)}',
                           ),
                           _buildDetailRow(
+                            context,
                             Icons.power_settings_new,
-                            "Kontak",
-                            "Açık (Simülasyon)",
+                            'Kontak',
+                            'Acik (Simulasyon)',
                           ),
                           ElevatedButton.icon(
                             onPressed: () => Navigator.pop(context),
                             icon: const Icon(Icons.arrow_back),
-                            label: const Text("Listeye Dön"),
+                            label: const Text('Listeye Don'),
                           ),
                         ],
                       ),
@@ -134,18 +141,28 @@ class _TrackingDetailScreenState extends ConsumerState<TrackingDetailScreen> {
             ],
           );
         },
-        error: (err, stack) => Center(child: Text("Hata: $err")),
+        error: (err, stack) => Center(child: Text('Hata: $err')),
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
     );
   }
 
-  Widget _buildDetailRow(IconData icon, String title, String value) {
+  Widget _buildDetailRow(
+    BuildContext context,
+    IconData icon,
+    String title,
+    String value,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Row(
       children: [
-        Icon(icon, color: Colors.blueGrey),
+        Icon(icon, color: colorScheme.secondary),
         const SizedBox(width: 10),
-        Text("$title:", style: const TextStyle(fontWeight: FontWeight.bold)),
+        Text(
+          '$title:',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         const Spacer(),
         Text(value),
       ],

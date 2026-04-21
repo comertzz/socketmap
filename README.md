@@ -104,6 +104,36 @@ SOCKET_URL=http://localhost:3000
 TRACKING_DEVICE_NAME=demo-device
 ```
 
+## Flavor Yapısı
+
+Projede iki marka girişi bulunur:
+
+- `Takibiz`: yeşil tema
+- `BMW`: mavi tema
+
+Flutter entry point dosyaları:
+
+- [lib/main_takibiz.dart](/c:/Users/comertZz/Desktop/masa/flutter/socket_map/lib/main_takibiz.dart)
+- [lib/main_bmw.dart](/c:/Users/comertZz/Desktop/masa/flutter/socket_map/lib/main_bmw.dart)
+
+Ortak flavor tanımları:
+
+- [lib/core/flavor/flavor_config.dart](/c:/Users/comertZz/Desktop/masa/flutter/socket_map/lib/core/flavor/flavor_config.dart)
+
+Android flavor çalıştırma örnekleri:
+
+```bash
+flutter run --flavor takibiz -t lib/main_takibiz.dart --dart-define-from-file=config/dart_defines.local.json
+flutter run --flavor bmw -t lib/main_bmw.dart --dart-define-from-file=config/dart_defines.local.json
+```
+
+İsterseniz genel giriş noktasını da kullanabilirsiniz:
+
+```bash
+flutter run --dart-define=APP_FLAVOR=takibiz --dart-define-from-file=config/dart_defines.local.json
+flutter run --dart-define=APP_FLAVOR=bmw --dart-define-from-file=config/dart_defines.local.json
+```
+
 Beklenen temel event yapıları:
 
 - İstemciden sunucuya: `takip_baslat`

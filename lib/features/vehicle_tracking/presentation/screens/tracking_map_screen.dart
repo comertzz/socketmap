@@ -3,8 +3,10 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:socket_map/core/flavor/flavor_config.dart';
+import 'package:socket_map/core/theme/theme_mode_provider.dart';
 import 'package:socket_map/features/vehicle_tracking/presentation/screens/tracking_detail_screen.dart';
-import '../providers/tracking_providers.dart';
+import 'package:socket_map/features/vehicle_tracking/presentation/providers/tracking_providers.dart';
 
 class TrackingMapScreen extends ConsumerStatefulWidget {
   const TrackingMapScreen({super.key});
@@ -19,9 +21,28 @@ class _TrackingMapScreenState extends ConsumerState<TrackingMapScreen> {
   @override
   Widget build(BuildContext context) {
     final fleetAsync = ref.watch(vehicleTrackingViewModelProvider);
+    final flavor = FlavorConfig.current;
+    final colorScheme = Theme.of(context).colorScheme;
+    final themeMode = ref.watch(appThemeModeProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Canlı Filo Takibi"), centerTitle: true),
+      appBar: AppBar(title: Text(flavor.brandTitle), centerTitle: true,
+      actions: [
+          IconButton(
+            onPressed: () {
+              ref.read(appThemeModeProvider.notifier).toggle();
+            },
+            icon: Icon(
+              themeMode == ThemeMode.dark
+                  ? Icons.light_mode_rounded
+                  : Icons.dark_mode_rounded,
+            ),
+            tooltip: themeMode == ThemeMode.dark
+                ? 'Aydinlik tema'
+                : 'Koyu tema',
+          ),
+        ],
+      ),
       body: fleetAsync.when(
         data: (fleet) {
           return FlutterMap(
@@ -33,7 +54,7 @@ class _TrackingMapScreenState extends ConsumerState<TrackingMapScreen> {
             children: [
               TileLayer(
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'com.example.socket_map',
+                userAgentPackageName: 'com.comertzz.socket_map',
               ),
               MarkerLayer(
                 markers: fleet.map((vehicle) {
@@ -49,7 +70,7 @@ class _TrackingMapScreenState extends ConsumerState<TrackingMapScreen> {
                             MaterialPageRoute(
                               builder: (context) => TrackingDetailScreen(
                                 vehicleName: vehicle.name,
-                              ), 
+                              ),
                             ),
                           ),
                           child: Container(
@@ -58,7 +79,7 @@ class _TrackingMapScreenState extends ConsumerState<TrackingMapScreen> {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.black87,
+                              color: colorScheme.secondary,
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
@@ -71,13 +92,12 @@ class _TrackingMapScreenState extends ConsumerState<TrackingMapScreen> {
                             ),
                           ),
                         ),
-
                         SizedBox(
                           width: 40,
                           height: 48.77,
                           child: SvgPicture.asset(
-                            clipBehavior: Clip.antiAlias,
                             'assets/svg/moving_state.svg',
+                            clipBehavior: Clip.antiAlias,
                           ),
                         ),
                       ],
@@ -87,15 +107,20 @@ class _TrackingMapScreenState extends ConsumerState<TrackingMapScreen> {
               ),
             ],
           );
-        }, 
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text("Hata: $err")),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _mapController.move(const LatLng(40.5, 34), 5.2);
         },
-        child: const Icon(Icons.map),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text('Hata: $err')),
+      ),
+      floatingActionButton: Column(
+        children: [
+          FloatingActionButton(
+            onPressed: () {
+              _mapController.move(const LatLng(40.5, 34), 5.2);
+            },
+            child: const Icon(Icons.map),
+          ),
+          FloatingActionButton(onPressed: () {}),
+        ],
       ),
     );
   }

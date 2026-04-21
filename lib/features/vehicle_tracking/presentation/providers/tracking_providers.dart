@@ -5,10 +5,17 @@ import 'package:socket_map/features/vehicle_tracking/data/sources/tracking_remot
 import 'package:socket_map/features/vehicle_tracking/domain/entities/vehicle_entity.dart';
 
 final socketProvider = Provider<io.Socket>((ref) {
-  return io.io(
+  final socket = io.io(
     AppConfig.socketUrl,
-    io.OptionBuilder().setTransports(['websocket']).build(),
+    io.OptionBuilder()
+        .setTransports(['websocket'])
+        .disableAutoConnect()
+        .build(),
   );
+
+  ref.onDispose(socket.dispose);
+
+  return socket;
 });
 
 final trackingDataSourceProvider = Provider((ref) {
@@ -19,10 +26,11 @@ final trackingDataSourceProvider = Provider((ref) {
 final vehicleTrackingViewModelProvider =
     StreamProvider<List<VehicleEntity>>((ref) {
       final dataSource = ref.watch(trackingDataSourceProvider);
+      final socket = ref.watch(socketProvider);
 
-      ref.read(socketProvider).emit('takip_baslat', {
-        'cihaz_adi': AppConfig.trackingDeviceName,
-      });
+      if (!socket.connected) {
+        socket.connect();
+      }
 
       return dataSource.getFleetStream();
     });

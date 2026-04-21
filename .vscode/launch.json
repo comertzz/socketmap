@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "takibiz Debug",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug",
+      "program": "lib/main_takibiz.dart",
+      "args": [
+        "--flavor",
+        "takibiz",
+        "--dart-define-from-file=config/dart_defines.local.json"
+      ]
+    },
+    {
+      "name": "BMW Debug",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug",
+      "program": "lib/main_bmw.dart",
+      "args": [
+        "--flavor",
+        "bmw",
+        "--dart-define-from-file=config/dart_defines.local.json"
+      ]
+    }
+  ]
+}

@@ -5,21 +5,12 @@ import 'package:socket_map/core/flavor/app_flavor.dart';
 import 'package:socket_map/core/flavor/flavor_config.dart';
 
 void main() {
-  const flavorName = String.fromEnvironment(
-    'APP_FLAVOR',
-    defaultValue: 'takibiz',
-  );
-
-  final flavor = AppFlavor.values.firstWhere(
-    (item) => item.name == flavorName,
-    orElse: () => AppFlavor.takibiz,
-  );
-
-  FlavorConfig.current = FlavorConfig.forFlavor(flavor);
+  FlavorConfig.current = FlavorConfig.forFlavor(AppFlavor.takibiz);
 
   runApp(
     const ProviderScope(
       child: MyApp(),
+      
     ),
   );
 }

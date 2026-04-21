@@ -1,4 +1,4 @@
-package com.example.socket_map
+package com.comertzz.socket_map
 
 import io.flutter.embedding.android.FlutterActivity
 
