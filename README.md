@@ -70,24 +70,39 @@ flutter run
 
 ## Soket Sunucusu Yapılandırması
 
-Repo içinde gerçek IP adresi tutulmaz. Soket adresi ve cihaz adı `--dart-define` ile dışarıdan verilir.
+Repo içinde gerçek IP adresi tutulmaz. Soket adresi ve cihaz adı `dart-define` üzerinden dışarıdan verilir.
 
-Varsayılan değerler:
+Merkezi config:
+
+- [lib/core/config/app_config.dart](/c:/Users/comertZz/Desktop/masa/flutter/socket_map/lib/core/config/app_config.dart)
+
+Yerel geliştirme için önerilen akış:
+
+1. [config/dart_defines.local.example.json](/c:/Users/comertZz/Desktop/masa/flutter/socket_map/config/dart_defines.local.example.json) dosyasını kopyalayıp `config/dart_defines.local.json` oluşturun.
+2. Kendi soket adresinizi ve cihaz adınızı bu yerel dosyaya yazın.
+3. Uygulamayı bu dosyayla çalıştırın.
+
+Örnek `config/dart_defines.local.json`:
+
+```json
+{
+  "SOCKET_URL": "http://192.168.x.x:3000",
+  "TRACKING_DEVICE_NAME": "23BS857"
+}
+```
+
+Çalıştırma:
+
+```bash
+flutter run --dart-define-from-file=config/dart_defines.local.json
+```
+
+Varsayılan fallback değerleri:
 
 ```text
 SOCKET_URL=http://localhost:3000
 TRACKING_DEVICE_NAME=demo-device
 ```
-
-Örnek çalıştırma:
-
-```bash
-flutter run --dart-define=SOCKET_URL=http://192.168.x.x:3000 --dart-define=TRACKING_DEVICE_NAME=23BS857
-```
-
-İlgili dosya:
-
-- [lib/features/vehicle_tracking/presentation/providers/tracking_providers.dart](/c:/Users/comertZz/Desktop/masa/flutter/socket_map/lib/features/vehicle_tracking/presentation/providers/tracking_providers.dart)
 
 Beklenen temel event yapıları:
 
